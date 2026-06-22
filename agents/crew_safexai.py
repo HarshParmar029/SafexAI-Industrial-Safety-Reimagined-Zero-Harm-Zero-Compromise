@@ -1,59 +1,57 @@
-from crewai import Agent, Crew, Task
-from langchain_groq import ChatGroq
+from groq import Groq
 from dotenv import load_dotenv
 import os
 
 load_dotenv()
-llm = ChatGroq(model="llama-3.3-70b-versatile", temperature=0.1)
 
-# Agents
-risk_agent = Agent(
-    role='Compound Risk Intelligence Expert',
-    goal='Identify dangerous combinations across sensors, permits, workers and context',
-    backstory='Senior Process Safety Engineer with 20+ years experience in steel, chemical and refinery plants. Expert in OISD, Factory Act, DGMS standards.',
-    llm=llm,
-    verbose=True
-)
+client = Groq(api_key=os.getenv("GROQ_API_KEY"))
 
-permit_agent = Agent(
-    role='Permit-to-Work Compliance Specialist',
-    goal='Cross-check active permits against live conditions and historical risks',
-    backstory='Former Safety Auditor who has prevented multiple major incidents.',
-    llm=llm,
-    verbose=True
-)
-
-emergency_agent = Agent(
-    role='Autonomous Emergency Response Orchestrator',
-    goal='Generate fastest, regulatory-compliant response plan',
-    backstory='Trained on thousands of real industrial incidents and best response protocols.',
-    llm=llm,
-    verbose=True
-)
+def _call_agent(system_prompt, user_prompt):
+    response = client.chat.completions.create(
+        model="llama-3.3-70b-versatile",
+        messages=[
+            {"role": "system", "content": system_prompt},
+            {"role": "user", "content": user_prompt}
+        ],
+        temperature=0.1,
+        max_tokens=800
+    )
+    return response.choices[0].message.content
 
 def run_full_safexai_analysis(zone, sensor_data, active_permits):
-    """Run complete multi-agent analysis"""
-    task1 = Task(
-        description=f"Analyze compound risks in {zone} using this sensor data: {sensor_data}",
-        agent=risk_agent,
-        expected_output="Risk level, key compound risks, regulatory violations"
-    )
-    task2 = Task(
-        description=f"Validate these permits against current risks: {active_permits}",
-        agent=permit_agent,
-        expected_output="Permit status recommendations with actions"
-    )
-    task3 = Task(
-        description="If critical risk, create detailed emergency response timeline",
-        agent=emergency_agent,
-        expected_output="Step-by-step response plan with timings"
+    # Agent 1: Risk Intelligence
+    risk_result = _call_agent(
+        system_prompt="You are a Senior Process Safety Engineer with 20+ years experience in Indian steel, chemical and refinery plants. Expert in OISD, Factory Act, DGMS standards. Be specific, cite regulation sections.",
+        user_prompt=f"Analyze compound risks in {zone}. Sensor data: {sensor_data}. Identify all dangerous combinations, risk level (CRITICAL/HIGH/MEDIUM), and specific regulatory violations with section numbers."
     )
 
-    crew = Crew(
-        agents=[risk_agent, permit_agent, emergency_agent],
-        tasks=[task1, task2, task3],
-        verbose=2
+    # Agent 2: Permit Compliance
+    permit_result = _call_agent(
+        system_prompt="You are a Permit-to-Work Compliance Specialist and former Safety Auditor. You catch dangerous permit conflicts that humans miss.",
+        user_prompt=f"Validate these active permits in {zone}: {active_permits}. Cross-check with sensor conditions: {sensor_data}. Give SUSPEND/PROCEED/REVIEW decision for each permit with reasons."
     )
-    
-    result = crew.kickoff(inputs={"zone": zone})
-    return result
+
+    # Agent 3: Emergency Orchestrator
+    emergency_result = _call_agent(
+        system_prompt="You are an Emergency Response Orchestrator trained on thousands of real Indian industrial incidents. Generate fast, regulatory-compliant response plans.",
+        user_prompt=f"CRITICAL risk detected in {zone}. Sensor: {sensor_data}. Create a step-by-step emergency response timeline with actions in seconds/minutes, responsible persons, and DGFASLI compliance checklist."
+    )
+
+    final_output = f"""
+## 🔴 Agent 1 — Compound Risk Intelligence
+{risk_result}
+
+---
+
+## 📋 Agent 2 — Permit Compliance Specialist  
+{permit_result}
+
+---
+
+## 🚨 Agent 3 — Emergency Response Orchestrator
+{emergency_result}
+
+---
+*✅ 3-Agent SafexAI Analysis Complete | Powered by Groq Llama 3.3 70B*
+"""
+    return final_output
