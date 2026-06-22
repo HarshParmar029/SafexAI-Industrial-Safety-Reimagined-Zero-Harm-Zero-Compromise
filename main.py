@@ -132,13 +132,14 @@ if st.session_state.crew_result:
     st.markdown(st.session_state.crew_result)
 
 st.divider()
-tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
+tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
     "📊 Live Dashboard",
     "🗺️ Geospatial Heatmap",
     "📋 Permit Intelligence",
     "🧠 RAG Incident Analysis",
     "🚨 Emergency Orchestrator",
-    "📜 Compliance Audit"
+    "📜 Compliance Audit",
+    "👷 PPE Detection"
 ])
 
 # ══════════════════════════════════════════════════════════════
@@ -613,6 +614,37 @@ with tab6:
                 file_name="SafexAI_Compliance_Report.txt",
                 mime="text/plain"
             )
+
+# ══════════════════════════════════════════════════════════════
+# TAB 7 — PPE DETECTION
+# ══════════════════════════════════════════════════════════════
+with tab7:
+    st.subheader("👷 AI-Powered PPE Violation Detection")
+    st.caption("Upload CCTV frame or site photo — YOLOv8 detects missing helmets, vests, gloves")
+
+    uploaded_img = st.file_uploader("Upload site image", type=["jpg", "jpeg", "png"])
+
+    if uploaded_img:
+        col1, col2 = st.columns(2)
+        with col1:
+            st.image(uploaded_img, caption="Original Image", use_container_width=True)
+
+        with st.spinner("🔍 YOLOv8 scanning for PPE violations..."):
+            from agents.ppe_detector import detect_ppe
+            result_img, summary = detect_ppe(uploaded_img)
+
+        with col2:
+            st.image(result_img, caption="AI Detection Result", use_container_width=True)
+
+        if summary["violation_count"] > 0:
+            st.error(f"🚨 {summary['violation_count']} PPE Violation(s) Detected — Risk: {summary['risk_level']}")
+            for v in summary["violations"]:
+                st.write(v)
+        else:
+            st.success("✅ All PPE Compliant — No violations detected")
+
+        st.metric("Total Detections", summary["total_detections"])
+        st.metric("Violations", summary["violation_count"])
 
 # ── FOOTER ─────────────────────────────────────────────────────
 st.divider()
