@@ -1,0 +1,8 @@
+incident_id,date,zone,type,severity,cause,workers_injured,fatalities,oisd_violated,prevented_by_ai
+INC-2021-001,2021-03-15,Zone A,Gas Explosion,FATAL,Hot work near CO accumulation,4,2,OISD-105,NO
+INC-2022-003,2022-08-22,Zone A,Confined Space,SERIOUS,Entry without gas-free cert,2,0,Factory Act S2,NO
+INC-2023-007,2023-11-10,Zone A,Fire,MAJOR,Hot work + gas leak compound,3,1,OISD-105,NO
+INC-2024-002,2024-02-28,Zone B,Equipment Failure,MINOR,High temperature + pressure,1,0,OISD-144,NO
+INC-2024-009,2024-09-14,Zone C,Chemical Spill,MODERATE,Pressure relief failure,0,0,DGMS-Code,NO
+INC-2025-001,2025-01-07,Zone A,Gas Explosion,FATAL,Compound - CO+H2S+Hot Work,8,3,OISD-105,NO
+INC-2026-SIM,2026-06-22,Zone A,PREVENTED,CRITICAL,Compound detected by SafexAI,0,0,N/A,YES
