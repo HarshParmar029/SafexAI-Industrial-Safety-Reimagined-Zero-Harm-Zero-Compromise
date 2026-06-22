@@ -118,14 +118,18 @@ st.divider()
 
 # ── MULTI-AGENT SAFEXAI ANALYSIS ────────────────────────────
 st.markdown("### 🚀 Full Multi-Agent Safety Intelligence")
+if "crew_result" not in st.session_state:
+    st.session_state.crew_result = None
+
 if st.button("🔥 Run Complete SafexAI Analysis (CrewAI)", type="primary", use_container_width=True):
     with st.spinner("All 3 AI Agents collaborating in real-time..."):
         sensor_summary = "CO:185ppm, H2S:12ppm, Temp:52°C, Pressure:HIGH, PPE Violations:3"
         permits = "HOT-7842(Hot Work), CS-4421(Confined Space)"
-        result = run_full_safexai_analysis(plant, sensor_summary, permits)
-    
+        st.session_state.crew_result = run_full_safexai_analysis(plant, sensor_summary, permits)
+
+if st.session_state.crew_result:
     st.success("✅ Multi-Agent Analysis Complete!")
-    st.markdown(result)
+    st.markdown(st.session_state.crew_result)
 
 st.divider()
 tab1, tab2, tab3, tab4, tab5, tab6 = st.tabs([
