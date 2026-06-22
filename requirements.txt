@@ -1,0 +1,15 @@
+ 
+streamlit
+langchain
+langchain-groq
+langchain-community
+chromadb
+pandas
+folium
+streamlit-folium
+plotly
+Pillow
+python-dotenv
+PyPDF2
+crewai
+langgraph
