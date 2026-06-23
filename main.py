@@ -132,14 +132,16 @@ if st.session_state.crew_result:
     st.markdown(st.session_state.crew_result)
 
 st.divider()
-tab1, tab2, tab3, tab4, tab5, tab6, tab7 = st.tabs([
+
+tab1, tab2, tab3, tab4, tab5, tab6, tab7, tab8 = st.tabs([
     "📊 Live Dashboard",
     "🗺️ Geospatial Heatmap",
     "📋 Permit Intelligence",
     "🧠 RAG Incident Analysis",
     "🚨 Emergency Orchestrator",
     "📜 Compliance Audit",
-    "👷 PPE Detection"
+    "👷 PPE Detection",
+    "🔮 What-If Simulator"
 ])
 
 # ══════════════════════════════════════════════════════════════
@@ -192,9 +194,9 @@ with tab1:
 """, unsafe_allow_html=True)
             col_a, col_b = st.columns(2)
             with col_a:
-                st.button(f"✅ Acknowledge + Execute Protocol", key=f"ack_{a['level']}")
+                st.button("✅ Acknowledge + Execute Protocol", key=f"ack_{a['level']}")
             with col_b:
-                st.button(f"📤 Escalate to Safety Officer", key=f"esc_{a['level']}")
+                st.button("📤 Escalate to Safety Officer", key=f"esc_{a['level']}")
 
     st.divider()
     col_left, col_right = st.columns(2)
@@ -229,9 +231,9 @@ with tab1:
             line=dict(color='#00cc66', width=2, dash='dash')
         ))
         fig.add_annotation(x="Now", y=185,
-                            text="🚨 CRITICAL", showarrow=True,
-                            arrowhead=2, arrowcolor="#ff4b4b",
-                            font=dict(color="#ff4b4b", size=12))
+                           text="🚨 CRITICAL", showarrow=True,
+                           arrowhead=2, arrowcolor="#ff4b4b",
+                           font=dict(color="#ff4b4b", size=12))
         fig.update_layout(
             paper_bgcolor='rgba(0,0,0,0)',
             plot_bgcolor='rgba(0,0,0,0.1)',
@@ -243,7 +245,6 @@ with tab1:
         )
         st.plotly_chart(fig, use_container_width=True)
 
-    # Risk Score Gauge
     st.subheader("🎯 Compound Risk Score — Zone A")
     fig_gauge = go.Figure(go.Indicator(
         mode="gauge+number+delta",
@@ -297,7 +298,6 @@ with tab2:
             icon=folium.Icon(color=color, icon='warning-sign', prefix='glyphicon')
         ).add_to(m)
 
-    # Worker locations
     workers = [
         (17.6876, 83.2197, "Worker W-001 — High Risk Zone"),
         (17.6874, 83.2193, "Worker W-002 — High Risk Zone"),
@@ -431,24 +431,16 @@ with tab4:
 ---
 
 **📄 Finding 1** *(Source: DGFASLI Fatal Accident Report, Jan 2025 | Similarity: 0.94)*
-The Visakhapatnam incident involved **compound conditions**: entrapped gas in coke oven battery + 
-maintenance activity + inadequate PTW verification. Individual sensors showed readings, but no 
-intelligence layer correlated them into an actionable alert. **This is exactly what SafexAI prevents.**
+The Visakhapatnam incident involved **compound conditions**: entrapped gas in coke oven battery + maintenance activity + inadequate PTW verification. Individual sensors showed readings, but no intelligence layer correlated them into an actionable alert. **This is exactly what SafexAI prevents.**
 
 **📄 Finding 2** *(Source: OISD-144 Section 6.3 | Similarity: 0.91)*
-Gas incidents in coke oven batteries are most frequently triggered during maintenance when 
-ventilation is compromised. Mandatory requirement: continuous gas monitoring + work suspension 
-when CO exceeds 50 ppm in confined areas.
+Gas incidents in coke oven batteries are most frequently triggered during maintenance when ventilation is compromised. Mandatory requirement: continuous gas monitoring + work suspension when CO exceeds 50 ppm in confined areas.
 
 **📄 Finding 3** *(Source: DGFASLI Incident DB 2019-2024 | Similarity: 0.88)*
-68% of fatal gas incidents occurred during **shift changeover periods**. Risk compounds when 
-maintenance permits overlap with handover windows — exactly the pattern detected in Zone A today.
+68% of fatal gas incidents occurred during **shift changeover periods**. Risk compounds when maintenance permits overlap with handover windows — exactly the pattern detected in Zone A today.
 
 **📄 Finding 4** *(Source: Factory Act 1948, Schedule 2 | Similarity: 0.85)*
-Confined space entry requires: (1) gas-free certificate, (2) continuous atmospheric testing,  
-(3) dedicated Safety Observer, (4) emergency rescue equipment standby.
-
----
+Confined space entry requires: (1) gas-free certificate, (2) continuous atmospheric testing, (3) dedicated Safety Observer, (4) emergency rescue equipment standby.
 
 **🎯 AI Prevention Priorities (ranked by impact):**
 1. 🥇 Real-time PTW ↔ Sensor correlation (SafexAI Compound Risk Engine)
@@ -519,7 +511,6 @@ with tab5:
             st.info("🏆 Industry average first response: **47 minutes** | SafexAI: **6.8 seconds**")
             st.session_state.emergency_triggered = True
 
-    # PDF always visible after trigger
     if st.session_state.emergency_triggered:
         st.divider()
         st.markdown("### 📄 Auto-Generate Incident Report (PDF)")
@@ -590,6 +581,151 @@ with tab5:
             showlegend=False
         )
         st.plotly_chart(fig_timeline, use_container_width=True)
+
+# ══════════════════════════════════════════════════════════════
+# TAB 8 — WHAT-IF RISK SIMULATOR
+# ══════════════════════════════════════════════════════════════
+with tab8:
+    st.subheader("🔮 What-If Risk Simulator")
+    st.caption("Simulate dangerous scenarios before they happen — AI predicts compound risk outcome")
+
+    st.info("💡 Adjust sensor values and permit conditions — AI instantly predicts compound risk level and regulatory violations")
+
+    col_sim1, col_sim2 = st.columns(2)
+
+    with col_sim1:
+        st.markdown("### ⚙️ Simulate Sensor Conditions")
+        sim_co = st.slider("CO Level (ppm)", 0, 300, 120)
+        sim_h2s = st.slider("H2S Level (ppm)", 0, 50, 8)
+        sim_temp = st.slider("Temperature (°C)", 20, 100, 42)
+        sim_pressure = st.select_slider("Pressure", ["NORMAL", "ELEVATED", "HIGH", "CRITICAL"], value="NORMAL")
+        sim_ppe = st.slider("PPE Violations", 0, 10, 0)
+
+        st.markdown("### 📋 Active Permits")
+        sim_hot_work = st.checkbox("Hot Work Permit Active", value=True, key="sim_hot_work")
+        sim_confined = st.checkbox("Confined Space Entry Active", value=False, key="sim_confined")
+        sim_electrical = st.checkbox("Electrical Isolation Active", value=False, key="sim_electrical")
+
+        sim_workers = st.slider("Workers in Zone", 1, 50, 5)
+
+    with col_sim2:
+        st.markdown("### 🎯 AI Risk Prediction")
+
+        risk_score = 0
+        violations_found = []
+        compound_risks = []
+
+        if sim_co > 150:
+            risk_score += 35
+            violations_found.append(f"❌ OISD-105 §4.2: CO {sim_co}ppm exceeds 150ppm limit")
+            if sim_hot_work:
+                compound_risks.append("🔴 CRITICAL: CO accumulation + Hot Work = Explosion risk")
+                risk_score += 25
+        elif sim_co > 100:
+            risk_score += 20
+            violations_found.append(f"⚠️ OISD-105: CO {sim_co}ppm approaching limit (100ppm warning)")
+
+        if sim_h2s > 10:
+            risk_score += 30
+            violations_found.append(f"❌ OISD-144 §5.2: H2S {sim_h2s}ppm exceeds 10ppm limit")
+            if sim_confined:
+                compound_risks.append("🔴 CRITICAL: H2S + Confined Space = Toxic atmosphere")
+                risk_score += 20
+        elif sim_h2s > 5:
+            risk_score += 10
+
+        if sim_temp > 45:
+            risk_score += 15
+            violations_found.append(f"❌ Factory Act §17: Temperature {sim_temp}°C exceeds 45°C limit")
+
+        if sim_pressure == "CRITICAL":
+            risk_score += 20
+            if sim_confined:
+                compound_risks.append("🔴 CRITICAL: High Pressure + Confined Space = Entrapment risk")
+                risk_score += 15
+        elif sim_pressure == "HIGH":
+            risk_score += 12
+
+        if sim_ppe > 0:
+            risk_score += sim_ppe * 3
+            violations_found.append(f"❌ Factory Act §21: {sim_ppe} PPE violation(s) detected")
+
+        if sim_workers > 10:
+            risk_score = min(100, risk_score + 10)
+
+        risk_score = min(100, risk_score)
+
+        if risk_score >= 70:
+            risk_level = "🔴 CRITICAL"
+            color = "#ff4b4b"
+        elif risk_score >= 45:
+            risk_level = "🟠 HIGH"
+            color = "#ff8c00"
+        elif risk_score >= 25:
+            risk_level = "🟡 MEDIUM"
+            color = "#ffd700"
+        else:
+            risk_level = "🟢 SAFE"
+            color = "#00cc66"
+
+        fig_sim = go.Figure(go.Indicator(
+            mode="gauge+number",
+            value=risk_score,
+            title={'text': f"Compound Risk Score — {risk_level}", 'font': {'color': 'white', 'size': 14}},
+            gauge={
+                'axis': {'range': [0, 100], 'tickcolor': 'white'},
+                'bar': {'color': color},
+                'steps': [
+                    {'range': [0, 25], 'color': '#00cc66'},
+                    {'range': [25, 45], 'color': '#ffd700'},
+                    {'range': [45, 70], 'color': '#ff8c00'},
+                    {'range': [70, 100], 'color': '#ff4b4b'}
+                ]
+            }
+        ))
+        fig_sim.update_layout(
+            paper_bgcolor='rgba(0,0,0,0)',
+            font_color='white', height=260
+        )
+        st.plotly_chart(fig_sim, use_container_width=True)
+
+        if compound_risks:
+            st.error("**🚨 Compound Risks Detected:**")
+            for r in compound_risks:
+                st.markdown(f"- {r}")
+        else:
+            st.success("✅ No compound risks detected with current settings")
+
+        if violations_found:
+            st.warning("**⚠️ Regulatory Violations:**")
+            for v in violations_found:
+                st.markdown(f"- {v}")
+
+        if risk_score >= 45:
+            st.error(f"👷 **{sim_workers} workers at risk** — Evacuation recommended")
+
+        if st.button("🤖 Get AI Recommendation for This Scenario", type="primary"):
+            with st.spinner("AI analyzing this specific scenario..."):
+                scenario_sensors = {
+                    "CO": f"{sim_co} ppm",
+                    "H2S": f"{sim_h2s} ppm",
+                    "Temperature": f"{sim_temp}°C",
+                    "Pressure": sim_pressure,
+                    "PPE Violations": sim_ppe
+                }
+                scenario_permits = []
+                if sim_hot_work:
+                    scenario_permits.append("Hot Work")
+                if sim_confined:
+                    scenario_permits.append("Confined Space")
+                if sim_electrical:
+                    scenario_permits.append("Electrical Isolation")
+
+                ai_rec = analyze_compound_risk(scenario_sensors, scenario_permits, "Simulated Zone")
+
+            st.success("**🤖 AI Recommendation:**")
+            st.markdown(ai_rec)
+
 # ══════════════════════════════════════════════════════════════
 # TAB 6 — COMPLIANCE AUDIT
 # ══════════════════════════════════════════════════════════════
