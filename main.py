@@ -477,6 +477,11 @@ with tab5:
     st.subheader("🚨 Emergency Response Orchestrator")
     st.warning("⚡ This agent activates autonomously on CRITICAL trigger. Manual activation available for drills.")
 
+    if "emergency_triggered" not in st.session_state:
+        st.session_state.emergency_triggered = False
+    if "pdf_buffer" not in st.session_state:
+        st.session_state.pdf_buffer = None
+
     col_trigger, col_timeline = st.columns([1, 1])
 
     with col_trigger:
@@ -512,12 +517,46 @@ with tab5:
 
             st.success("✅ All 7 response actions completed in **6.8 seconds**")
             st.info("🏆 Industry average first response: **47 minutes** | SafexAI: **6.8 seconds**")
+            st.session_state.emergency_triggered = True
+
+    # PDF always visible after trigger
+    if st.session_state.emergency_triggered:
+        st.divider()
+        st.markdown("### 📄 Auto-Generate Incident Report (PDF)")
+        if st.button("📥 Generate DGFASLI-Compliant PDF Report", use_container_width=True):
+            try:
+                from utils.report_generator import generate_incident_report
+            except Exception as e:
+                st.error(f"Report generator error: {e}")
+                st.stop()
+
+            sensor_data = [
+                {"sensor": "CO Gas (GAS-CO-001)", "reading": "185 ppm", "threshold": "150 ppm", "status": "CRITICAL"},
+                {"sensor": "H2S Gas (GAS-H2S-002)", "reading": "12 ppm", "threshold": "10 ppm", "status": "CRITICAL"},
+                {"sensor": "Temperature (TEMP-003)", "reading": "52°C", "threshold": "45°C", "status": "CRITICAL"},
+                {"sensor": "Pressure (PRESS-004)", "reading": "HIGH", "threshold": "NORMAL", "status": "WARNING"},
+                {"sensor": "PPE Camera (PPE-CAM-005)", "reading": "3 violations", "threshold": "0", "status": "CRITICAL"},
+            ]
+            violations = [
+                "OISD-105 §4.2: Hot work prohibited — CO exceeds 100 ppm",
+                "OISD-144 §5.2: H2S exceeds 10 ppm threshold",
+                "Factory Act 1948 §17: Temperature exceeds 45°C limit",
+                "Factory Act 1948 §21: PPE violations detected (3 workers)",
+            ]
+            analysis = st.session_state.get("crew_result", "Multi-agent analysis not yet run. Please run SafexAI Analysis first.")
+
+            pdf_buffer = generate_incident_report(affected_zone, sensor_data, violations, analysis)
+            st.session_state.pdf_buffer = pdf_buffer.read()
+
+        if st.session_state.pdf_buffer:
             st.download_button(
-                "📄 Download Auto-Generated Incident Report",
-                data="SAFEXAI INCIDENT REPORT\nDate: 22-Jun-2026\nZone: A\nIncident: Gas Accumulation + Hot Work\nActions Taken: Evacuation, Permit Suspension, SCADA Isolation\nRegulatory Ref: OISD-105, Factory Act Schedule 2",
-                file_name="SafexAI_Incident_Report_ZoneA.txt",
-                mime="text/plain"
+                label="⬇️ Download Incident Report PDF",
+                data=st.session_state.pdf_buffer,
+                file_name=f"SafexAI_Incident_Report_{datetime.now().strftime('%Y%m%d_%H%M')}.pdf",
+                mime="application/pdf",
+                type="primary"
             )
+            st.success("✅ PDF ready! Click above to download.")
 
     with col_timeline:
         st.markdown("### ⏱️ Response Action Timeline")
@@ -551,7 +590,6 @@ with tab5:
             showlegend=False
         )
         st.plotly_chart(fig_timeline, use_container_width=True)
-
 # ══════════════════════════════════════════════════════════════
 # TAB 6 — COMPLIANCE AUDIT
 # ══════════════════════════════════════════════════════════════
