@@ -3,7 +3,7 @@
 
 <div align="center">
 
-![SafexAI Banner](outputs/screenshots/dashboard.png)
+![SafexAI Banner](outputs/screenshots/safexai_banner.png)
 
 [![ET AI Hackathon 2026](https://img.shields.io/badge/ET%20AI%20Hackathon%202026-Problem%20Statement%20%231-red?style=for-the-badge)](https://economictimes.indiatimes.com/et-ai-hackathon/2nd-edition)
 [![Groq](https://img.shields.io/badge/Powered%20by-Groq%20Llama%203.3%2070B-orange?style=for-the-badge)](https://groq.com)
