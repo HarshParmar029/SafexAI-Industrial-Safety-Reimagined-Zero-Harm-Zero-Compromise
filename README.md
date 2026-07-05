@@ -89,6 +89,10 @@ Real-time CCTV-based detection of missing hardhats and safety vests, with automa
 
 ## 🏗️ Architecture
 
+![SafexAI Architecture Diagram](architecture/safexai_architecture_diagram.png)
+
+*4-Layer Architecture with Multi-Agent System, RAG Pipeline & YOLOv8 CV Engine*
+
 ```
 ┌─────────────────────────────────────────────────────────────┐
 │                    LAYER 1: DATA INGESTION                  │
