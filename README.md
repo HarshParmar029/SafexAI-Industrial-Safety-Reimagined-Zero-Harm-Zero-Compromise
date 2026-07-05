@@ -13,7 +13,7 @@
 
 **An AI-powered multi-agent platform that detects compound industrial risks in real time and prevents accidents before they happen.**
 
-[🚀 Live Demo](#quick-start) • [📄 Detailed Document](docs/) • [🎥 Demo Video](#demo-video) • [🏗️ Architecture](#architecture)
+[🚀 Live Demo](#quick-start) • [📄 Detailed Document](docs/) • [🎥 Demo Video](#demo-video) • [🏗️ Architecture](#-architecture)
 
 </div>
 
