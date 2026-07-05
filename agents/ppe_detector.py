@@ -5,7 +5,7 @@ import io
 import os
 
 def get_ppe_model():
-    model_path = "ppe_model.pt"
+    model_path = "models/best.pt"
     if not os.path.exists(model_path):
         from huggingface_hub import hf_hub_download
         model_path = hf_hub_download(
@@ -39,22 +39,15 @@ def detect_ppe(image_file):
                 
                 label_lower = label.lower()
                 if any(x in label_lower for x in ["no-hardhat", "no hardhat", "no_hardhat", "without"]):
-                    violations.append(f"❌ No Hardhat (conf: {round(conf*100,1)}%)")
-                elif any(x in label_lower for x in ["no-vest", "no vest", "no_vest"]):
-                    violations.append(f"❌ No Safety Vest (conf: {round(conf*100,1)}%)")
-
-    annotated = results[0].plot()
-    annotated_pil = Image.fromarray(annotated)
-    buf = io.BytesIO()
-    annotated_pil.save(buf, format="PNG")
-    buf.seek(0)
-
+                    violations.append(f"Missing PPE detected: {label} ({round(conf*100,1)}% confidence)")
+    
+    result_img = Image.fromarray(results[0].plot()[..., ::-1])
+    
     summary = {
         "total_detections": len(detections),
         "violations": violations,
         "violation_count": len(violations),
-        "detections": detections,
-        "risk_level": "CRITICAL" if len(violations) >= 3 else "HIGH" if len(violations) >= 1 else "SAFE"
+        "detections": detections
     }
     
-    return buf, summary
+    return result_img, summary
