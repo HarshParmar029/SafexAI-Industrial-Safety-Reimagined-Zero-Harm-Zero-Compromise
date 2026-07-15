@@ -186,8 +186,7 @@ SafexAI/
 
 ## 🎥 Demo Video
 
-> 📹 **[Watch 3-minute Demo](#)** *(Link will be added before submission)*
-
+> 📹 **[Watch Demo Video](https://youtu.be/MoKwSzxoW3I?si=xDlgeVzdnsRs9FaJ)**
 The demo covers:
 - Live compound risk detection in Zone A
 - AI permit analysis with regulatory citations
@@ -195,6 +194,7 @@ The demo covers:
 - RAG incident intelligence queries
 - Geospatial safety heatmap
 
+> **[Watch .CSV Demo Files In Drive ](https://drive.google.com/drive/folders/1tXZ2Zubqjvl4j5n66bdKGGeFysqSJ1hx?usp=sharing)**
 ---
 
 ## 📋 Problem Statement Alignment
